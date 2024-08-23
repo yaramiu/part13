@@ -26,4 +26,19 @@ router.delete("/:id", async (request, response) => {
   response.status(204).end();
 });
 
+router.put("/:id", async (request, response) => {
+  const blog = await Blog.findByPk(request.params.id);
+  if (blog) {
+    blog.likes = request.body.likes;
+    try {
+      await blog.save();
+      response.json(blog);
+    } catch (error) {
+      response.status(400).json({ error: "likes is not an integer" });
+    }
+  } else {
+    response.status(404).end();
+  }
+});
+
 export default router;
