@@ -10,12 +10,8 @@ router.get("/", async (_request, response) => {
 });
 
 router.post("/", async (request, response) => {
-  try {
-    const createdBlog = await Blog.create(request.body);
-    return response.json(createdBlog);
-  } catch (error) {
-    return response.status(400).end();
-  }
+  const createdBlog = await Blog.create(request.body);
+  return response.json(createdBlog);
 });
 
 router.delete("/:id", async (request, response) => {
@@ -30,12 +26,8 @@ router.put("/:id", async (request, response) => {
   const blog = await Blog.findByPk(request.params.id);
   if (blog) {
     blog.likes = request.body.likes;
-    try {
-      await blog.save();
-      response.json(blog);
-    } catch (error) {
-      response.status(400).json({ error: "likes is not an integer" });
-    }
+    await blog.save();
+    response.json(blog);
   } else {
     response.status(404).end();
   }
