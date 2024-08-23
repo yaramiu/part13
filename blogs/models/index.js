@@ -1,5 +1,7 @@
 import Blog from "./blog.js";
+import User from "./user.js";
 
-Blog.sync();
+Blog.sync({ alter: true });
+User.sync({ alter: true });
 
-export { Blog };
+export { Blog, User };
