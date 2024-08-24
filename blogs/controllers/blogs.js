@@ -1,4 +1,5 @@
-import express from "express";
+import express, { request } from "express";
+import { Op } from "sequelize";
 
 import { Blog, User } from "../models/index.js";
 
@@ -6,13 +7,20 @@ import { tokenDecoder } from "../utils/middleware.js";
 
 const router = express.Router();
 
-router.get("/", async (_request, response) => {
+router.get("/", async (request, response) => {
+  const where = {};
+
+  if (request.query.search) {
+    where.title = { [Op.iLike]: `%${request.query.search}%` };
+  }
+
   const blogs = await Blog.findAll({
     attributes: { exclude: "userId" },
     include: {
       model: User,
       attributes: ["name"],
     },
+    where,
   });
   response.json(blogs);
 });
