@@ -2,6 +2,8 @@ import express from "express";
 
 import { Blog } from "../models/index.js";
 
+import { tokenDecoder } from "../utils/middleware.js";
+
 const router = express.Router();
 
 router.get("/", async (_request, response) => {
@@ -9,8 +11,11 @@ router.get("/", async (_request, response) => {
   response.json(blogs);
 });
 
-router.post("/", async (request, response) => {
-  const createdBlog = await Blog.create(request.body);
+router.post("/", tokenDecoder, async (request, response) => {
+  const createdBlog = await Blog.create({
+    ...request.body,
+    userId: request.decodedToken.id,
+  });
   return response.json(createdBlog);
 });
 
