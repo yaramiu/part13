@@ -8,10 +8,23 @@ import { tokenDecoder } from "../utils/middleware.js";
 const router = express.Router();
 
 router.get("/", async (request, response) => {
-  const where = {};
+  let where = {};
 
   if (request.query.search) {
-    where.title = { [Op.iLike]: `%${request.query.search}%` };
+    where = {
+      [Op.or]: [
+        {
+          title: {
+            [Op.iLike]: `%${request.query.search}%`,
+          },
+        },
+        {
+          author: {
+            [Op.iLike]: `%${request.query.search}%`,
+          },
+        },
+      ],
+    };
   }
 
   const blogs = await Blog.findAll({
