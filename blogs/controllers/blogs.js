@@ -1,13 +1,19 @@
 import express from "express";
 
-import { Blog } from "../models/index.js";
+import { Blog, User } from "../models/index.js";
 
 import { tokenDecoder } from "../utils/middleware.js";
 
 const router = express.Router();
 
 router.get("/", async (_request, response) => {
-  const blogs = await Blog.findAll();
+  const blogs = await Blog.findAll({
+    attributes: { exclude: "userId" },
+    include: {
+      model: User,
+      attributes: ["name"],
+    },
+  });
   response.json(blogs);
 });
 
