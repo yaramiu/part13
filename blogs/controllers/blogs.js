@@ -19,9 +19,9 @@ router.post("/", tokenDecoder, async (request, response) => {
   return response.json(createdBlog);
 });
 
-router.delete("/:id", async (request, response) => {
+router.delete("/:id", tokenDecoder, async (request, response) => {
   const blog = await Blog.findByPk(request.params.id);
-  if (blog) {
+  if (blog && blog.userId === request.decodedToken.id) {
     await blog.destroy();
   }
   response.status(204).end();
