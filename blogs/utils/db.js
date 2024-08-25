@@ -11,6 +11,7 @@ const connectToDatabase = async () => {
     await runMigrations();
     console.log("connected to database");
   } catch (error) {
+    console.error(error.message);
     console.error("error connecting to database");
   }
 };
