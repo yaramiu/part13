@@ -40,8 +40,24 @@ router.get("/", async (request, response) => {
 });
 
 router.post("/", tokenDecoder, async (request, response) => {
+  const { author, url, title, year } = request.body;
+
+  if (
+    !year ||
+    isNaN(year) ||
+    !(Number(year) >= 1991 && Number(year) <= new Date().getFullYear())
+  ) {
+    return response.status(400).json({ error: "invalid year" });
+  }
+
+  const blog = {
+    author,
+    url,
+    title,
+    year: Number(year),
+  };
   const createdBlog = await Blog.create({
-    ...request.body,
+    ...blog,
     userId: request.decodedToken.id,
   });
   return response.json(createdBlog);

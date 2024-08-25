@@ -18,6 +18,8 @@ const tokenDecoder = (request, response, next) => {
 };
 
 const errorHandler = (error, _request, response, next) => {
+  console.error(error.message);
+
   if (error.name === "SequelizeValidationError") {
     return response.status(400).json({ error: [error.message.split(": ")[1]] });
   } else if (error.name === "SequelizeDatabaseError") {
