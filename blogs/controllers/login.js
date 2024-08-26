@@ -1,7 +1,7 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 
-import { User } from "../models/index.js";
+import { User, Session } from "../models/index.js";
 
 import { SECRET } from "../utils/config.js";
 
@@ -20,6 +20,15 @@ router.post("/", async (request, response) => {
     username: user.username,
   };
   const token = jwt.sign(userForToken, SECRET);
+
+  const existingSession = await Session.findByPk(user.id);
+  if (!existingSession) {
+    await Session.create({ userId: user.id, token });
+  } else {
+    existingSession.token = token;
+    await existingSession.save();
+  }
+
   response.json({ token, name: user.name, username: user.username });
 });
 

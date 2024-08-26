@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 import { SECRET } from "./config.js";
+import { Session, User } from "../models/index.js";
 
 const tokenDecoder = (request, response, next) => {
   const authorizationHeader = request.get("Authorization");
@@ -17,6 +18,27 @@ const tokenDecoder = (request, response, next) => {
   next();
 };
 
+const handleDisabledAccounts = async (request, response, next) => {
+  const user = await User.findByPk(request.decodedToken.id);
+  if (!user) {
+    return response.status(404).json({ error: "could not find user" });
+  }
+  if (user.disabled) {
+    response
+      .status(401)
+      .json({ error: "account disabled, please contact admin" });
+  }
+  next();
+};
+
+const checkSessionValidity = async (request, response, next) => {
+  const session = await Session.findByPk(request.decodedToken.id);
+  if (!session || request.get("Authorization").substring(7) !== session.token) {
+    return response.status(401).json({ error: "session invalid" });
+  }
+  next();
+};
+
 const errorHandler = (error, _request, response, next) => {
   console.error(error.message);
 
@@ -29,4 +51,9 @@ const errorHandler = (error, _request, response, next) => {
   next();
 };
 
-export { errorHandler, tokenDecoder };
+export {
+  errorHandler,
+  tokenDecoder,
+  handleDisabledAccounts,
+  checkSessionValidity,
+};

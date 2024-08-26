@@ -3,7 +3,11 @@ import { Op } from "sequelize";
 
 import { Blog, User } from "../models/index.js";
 
-import { tokenDecoder } from "../utils/middleware.js";
+import {
+  tokenDecoder,
+  handleDisabledAccounts,
+  checkSessionValidity,
+} from "../utils/middleware.js";
 
 const router = express.Router();
 
@@ -39,37 +43,49 @@ router.get("/", async (request, response) => {
   response.json(blogs);
 });
 
-router.post("/", tokenDecoder, async (request, response) => {
-  const { author, url, title, year } = request.body;
+router.post(
+  "/",
+  tokenDecoder,
+  handleDisabledAccounts,
+  checkSessionValidity,
+  async (request, response) => {
+    const { author, url, title, year } = request.body;
 
-  if (
-    !year ||
-    isNaN(year) ||
-    !(Number(year) >= 1991 && Number(year) <= new Date().getFullYear())
-  ) {
-    return response.status(400).json({ error: "invalid year" });
+    if (
+      !year ||
+      isNaN(year) ||
+      !(Number(year) >= 1991 && Number(year) <= new Date().getFullYear())
+    ) {
+      return response.status(400).json({ error: "invalid year" });
+    }
+
+    const blog = {
+      author,
+      url,
+      title,
+      year: Number(year),
+    };
+    const createdBlog = await Blog.create({
+      ...blog,
+      userId: request.decodedToken.id,
+    });
+    return response.json(createdBlog);
   }
+);
 
-  const blog = {
-    author,
-    url,
-    title,
-    year: Number(year),
-  };
-  const createdBlog = await Blog.create({
-    ...blog,
-    userId: request.decodedToken.id,
-  });
-  return response.json(createdBlog);
-});
-
-router.delete("/:id", tokenDecoder, async (request, response) => {
-  const blog = await Blog.findByPk(request.params.id);
-  if (blog && blog.userId === request.decodedToken.id) {
-    await blog.destroy();
+router.delete(
+  "/:id",
+  tokenDecoder,
+  handleDisabledAccounts,
+  checkSessionValidity,
+  async (request, response) => {
+    const blog = await Blog.findByPk(request.params.id);
+    if (blog && blog.userId === request.decodedToken.id) {
+      await blog.destroy();
+    }
+    response.status(204).end();
   }
-  response.status(204).end();
-});
+);
 
 router.put("/:id", async (request, response) => {
   const blog = await Blog.findByPk(request.params.id);
