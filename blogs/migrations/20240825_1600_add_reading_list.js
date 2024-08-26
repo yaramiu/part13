@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 
 const up = async ({ context: queryInterface }) => {
-  await queryInterface.createTable("reading_lists", {
+  await queryInterface.createTable("readinglists", {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -17,7 +17,7 @@ const up = async ({ context: queryInterface }) => {
       allowNull: false,
       references: { model: "blogs", key: "id" },
     },
-    is_read: {
+    read: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },

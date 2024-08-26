@@ -5,7 +5,7 @@ import blogsRouter from "./controllers/blogs.js";
 import usersRouter from "./controllers/users.js";
 import loginRouter from "./controllers/login.js";
 import authorsRouter from "./controllers/authors.js";
-import readingListsRouter from "./controllers/reading_lists.js";
+import readingListsRouter from "./controllers/readinglists.js";
 
 import { connectToDatabase } from "./utils/db.js";
 import { PORT } from "./utils/config.js";

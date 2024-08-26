@@ -23,7 +23,7 @@ ReadingList.init(
       allowNull: false,
       references: { model: Blog, key: "id" },
     },
-    is_read: {
+    read: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
@@ -32,7 +32,7 @@ ReadingList.init(
     sequelize,
     underscored: true,
     timestamps: false,
-    modelName: "reading_list",
+    modelName: "readinglist",
   }
 );
 

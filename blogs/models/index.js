@@ -1,6 +1,6 @@
 import Blog from "./blog.js";
 import User from "./user.js";
-import ReadingList from "./reading_list.js";
+import ReadingList from "./readinglist.js";
 
 User.hasMany(Blog);
 Blog.belongsTo(User);
