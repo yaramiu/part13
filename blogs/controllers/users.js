@@ -1,4 +1,5 @@
 import express from "express";
+import { Op } from "sequelize";
 
 import { User, Blog } from "../models/index.js";
 
@@ -20,6 +21,16 @@ router.get("/", async (_request, response) => {
 });
 
 router.get("/:id", async (request, response) => {
+  const where = { read: { [Op.or]: [true, false] } };
+
+  if (request.query.read) {
+    if (request.query.read === "true" || request.query.read === "false") {
+      where.read = request.query.read === "true";
+    } else {
+      return response.status(400).json({ error: "invalid query parameter" });
+    }
+  }
+
   const user = await User.findByPk(request.params.id, {
     attributes: ["name", "username"],
     include: [
@@ -29,6 +40,7 @@ router.get("/:id", async (request, response) => {
         attributes: { exclude: ["createdAt", "updatedAt", "userId"] },
         through: {
           attributes: ["id", "read"],
+          where,
         },
       },
     ],
