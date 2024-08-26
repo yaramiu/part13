@@ -19,6 +19,23 @@ router.get("/", async (_request, response) => {
   response.json(users);
 });
 
+router.get("/:id", async (request, response) => {
+  const user = await User.findByPk(request.params.id, {
+    attributes: ["name", "username"],
+    include: [
+      {
+        model: Blog,
+        as: "readings",
+        attributes: { exclude: ["createdAt", "updatedAt", "userId"] },
+        through: {
+          attributes: [],
+        },
+      },
+    ],
+  });
+  response.json(user);
+});
+
 router.put("/:username", async (request, response) => {
   const user = await User.findOne({
     where: { username: request.params.username },
